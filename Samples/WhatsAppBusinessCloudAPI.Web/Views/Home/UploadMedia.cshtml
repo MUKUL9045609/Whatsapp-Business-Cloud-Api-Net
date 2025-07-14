@@ -1,0 +1,63 @@
+﻿@model UploadMediaViewModel
+@{
+	ViewData["Title"] = "Upload Media to WhatsApp";
+	ViewData["CurrentPage"] = "Upload Media";
+	Layout = "~/Views/Shared/AdminLTE/_AdminLayout.cshtml";
+	ViewData["ControllerName"] = nameof(HomeController).Replace("Controller", "");
+	ViewData["ActionName"] = nameof(HomeController.UploadMedia);
+}
+
+<section class="content">
+	<div class="row">
+		<div class="col-12">
+			<div class="card card-info">
+				<div class="card-header">
+					<h3 class="card-title">Upload Media to WhatsApp</h3>
+				</div> <!--/. card-header -->
+				<!--Form start -->
+				<form asp-action="UploadMedia" enctype="multipart/form-data">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="card-body">
+						<div class="form-group">
+							<label class="control-label">Media File</label>
+							<div class="input-group">
+								<input type="file" class="custom-file-input" id="mediaFile" name="mediaFile" />
+								<label class="custom-file-label">Choose Media File</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label">Upload Type</label>
+							<select class="form-control form-select form-select-lg mb-3" asp-for="SelectedUploadType" asp-items="@Model.UploadType"></select>
+							<span asp-validation-for="SelectedUploadType" class="form-control" />
+						</div>
+
+						@if (ViewBag.MediaId != null)
+						{
+							<p>Media Id from WhatsApp: @ViewBag.MediaId</p>
+						}
+
+						@if (ViewBag.H != null)
+						{
+							<p>H from WhatsApp: @ViewBag.H</p>
+						}
+
+						@if (ViewBag.StatusId != null)
+						{
+							<p>File Upload Status Id: @ViewBag.StatusId</p>
+							<p>File Offset: @ViewBag.FileOffset</p>
+						}
+					</div> <!--/. card-body -->
+					<div class="card-footer">
+						<button type="submit" name="submit" class="btn btn-primary">Upload Media</button>
+					</div>
+				</form>
+			</div> <!-- /.card -->
+		</div>
+	</div>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	} 

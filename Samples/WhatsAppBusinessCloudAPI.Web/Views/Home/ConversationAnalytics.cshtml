@@ -1,0 +1,20 @@
+﻿@model WhatsappBusiness.CloudApi.Response.ConversationAnalyticsResponse
+@{
+	ViewData["Title"] = "Account Metrics - Conversation Analytics";
+	ViewData["CurrentPage"] = "Account Metrics - Conversation Analytics";
+	Layout = "~/Views/Shared/AdminLTE/_AdminLayout.cshtml";
+	ViewData["ControllerName"] = nameof(HomeController).Replace("Controller", "");
+	ViewData["ActionName"] = nameof(HomeController.ConversationAnalytics);
+}
+
+<section class="content">
+	<div class="row">
+		<p>@JsonSerializer.Serialize(Model)</p>
+	</div>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	} 
