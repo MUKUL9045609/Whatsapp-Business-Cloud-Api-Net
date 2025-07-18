@@ -1,0 +1,99 @@
+﻿@using WhatsappBusiness.CloudApi.Response
+@model TemplateResponse;
+@{
+	ViewData["Title"] = "Get All Template  Page";
+	// ViewData["CurrentPage"] = "Send WhatsApp Text Message";
+	Layout = "~/Views/Shared/AdminLTE/_AdminLayout.cshtml";
+	// ViewData["ControllerName"] = nameof(HomeController).Replace("Controller", "");
+	// ViewData["ActionName"] = nameof(HomeController.SendWhatsAppTextMessage);
+}
+
+<section class="content">
+	<div class="row">
+		<div class="col-12">
+			<div class="card card-info">
+				<div class="card-header">
+					<div class="font-weight-bold">
+						<h1 class="card-title">Template List </h1>
+					</div>
+				</div>	
+					<a href="@Url.Action("CreateTemplate", "TemplateManagement")" class="btn btn-primary stretched-link float-right">Create Template</a>
+					
+				</div>
+				
+				
+				@foreach(var template in Model.Data)
+				{
+					<div class=" w-100 p-4">
+						<div class="card text-white bg-secondary ">
+						<h5 class="card-header">@template.Name</h5>
+						<div class="card-body">
+							@* <h5 class="card-title">@template.Category</h5 *@
+								<h5 class="card-title">@template.Status</h5>
+								<br />
+									<h5 class="card-title">@template.Id</h5>
+							<br />
+									<h5 class="card-title">@template.Language</h5>
+							<br />
+							<h5 class="card-title">@template.Category</h5>
+							@{
+								int count = 1; 
+							}
+
+							@foreach (var component in template.Components)
+							{
+								@if (component.Type.Equals("HEADER"))
+								{
+									<p class="card-text">@component.Type</p>
+									<p class="card-text">@component.Format</p>
+									<p class="card-text">@count. @component.Text</p>
+
+								}
+
+								@if (component.Type.Equals("BODY"))
+								{
+									<p class="card-text">@component.Type</p>
+									<p class="card-text">@count. @component.Text</p>
+								
+								}
+								@if (component.Type.Equals("FOOTER"))
+								{
+									<p class="card-text">@component.Type</p>
+									<p class="card-text">@count. @component.Text</p>
+
+								}
+								
+							    @if (component.Type.Equals("BUTTONS"))
+								{
+									<p class="card-text">@component.Type</p>
+									@foreach (var btn in component.Buttons)
+									{
+										<p class="card-text">@btn.Type</p>
+										<p class="card-text">@count. @btn.Text</p>
+										<p class="card-text">@btn.Url</p>
+			
+									}
+								}
+								
+								
+								@* <a href="#" class="btn btn-primary">Go somewhere</a> *@
+
+								count++; // Increment the counter
+							}
+
+							
+						</div>
+					</div>
+					</div>
+				}
+				
+			</div> <!-- /.card -->
+		</div>
+	</div>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+} 

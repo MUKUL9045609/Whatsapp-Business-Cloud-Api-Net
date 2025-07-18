@@ -7,6 +7,8 @@ namespace WhatsappBusiness.CloudApi.Response
     {
         [JsonPropertyName("data")]
         public List<TemplateData> Data { get; set; }
+        [JsonPropertyName("components")]
+        public List<WhatsAppBusinessHSMWhatsAppHSMComponentGet> Components { get; set; }
 
         [JsonPropertyName("paging")]
         public TemplatePaging Paging { get; set; }

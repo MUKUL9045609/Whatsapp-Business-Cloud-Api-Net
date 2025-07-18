@@ -1,0 +1,83 @@
+﻿@using WhatsappBusiness.CloudApi.Response
+@model WhatsAppTemplateResponse;
+@{
+	ViewData["Title"] = "Get All Template  Page";
+	// ViewData["CurrentPage"] = "Send WhatsApp Text Message";
+	Layout = "~/Views/Shared/AdminLTE/_AdminLayout.cshtml";
+	// ViewData["ControllerName"] = nameof(HomeController).Replace("Controller", "");
+	// ViewData["ActionName"] = nameof(HomeController.SendWhatsAppTextMessage);
+}
+
+<section class="content">
+    <div class="row g-3">
+		<div class="col-12">
+			<div class="card card-info">
+				<div class="card-header">
+					<h3 class="card-title">Create Template </h3>
+				</div>
+
+                <form asp-action="SaveTemplate" method="post" class="p-4 border rounded  bg-light">
+                    <h4>Create WhatsApp Template</h4>
+                    <br />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label">Template Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="fortune_sale" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Language" class="form-label">Language</label>
+                            <input asp-for="Language" class="form-control" placeholder="en_US" />
+                        </div>
+                    </div>
+                    
+                    <br />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Category" class="form-label">Category</label>
+                            <input asp-for="Category" class="form-control" placeholder="MARKETING" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="DummyField" class="form-label">Dummy Field</label>
+                            <input asp-for="DummyField" class="form-control" placeholder="This is a dummy field for demonstration purposes...." />
+                        </div>
+
+                    </div>
+                   
+                    <hr />
+
+                    <div class="mb-3">
+                        <label asp-for="HeaderText" class="form-label">Header Text</label>
+                        <input asp-for="HeaderText" class="form-control" placeholder="Our sales is on! eg(Diwali sales)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BodyText" class="form-label">Body Text</label>
+                        <textarea asp-for="BodyText" class="form-control" rows="3" placeholder="Shop now through..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FooterText" class="form-label">Footer Text</label>
+                        <input asp-for="FooterText" class="form-control" placeholder="Manage subscriptions below." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quick Reply Buttons</label>
+                        <input asp-for="Button1Text" class="form-control mb-2" placeholder="Unsubscribe from Promos" />
+                        <input asp-for="Button2Text" class="form-control" placeholder="Unsubscribe from All" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Template</button>
+                </form>
+				
+			</div> <!-- /.card -->
+		</div>
+	</div>
+</section>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

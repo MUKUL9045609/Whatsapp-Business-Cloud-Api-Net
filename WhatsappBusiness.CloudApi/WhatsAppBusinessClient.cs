@@ -1665,7 +1665,8 @@ namespace WhatsappBusiness.CloudApi
 
             if (string.IsNullOrWhiteSpace(pagingUrl))
             {
-                return await WhatsAppBusinessGetAsync<TemplateResponse>(formattedWhatsAppEndpoint, cancellationToken);
+              var result =  await WhatsAppBusinessGetAsync<TemplateResponse>(formattedWhatsAppEndpoint, cancellationToken);
+                return result;
             }
             else
             {

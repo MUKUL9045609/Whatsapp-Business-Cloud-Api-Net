@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Threading;
 using WhatsappBusiness.CloudApi.Configurations;
 using WhatsappBusiness.CloudApi.Interfaces;
+using WhatsappBusiness.CloudApi.WhasAppBusinessClientServices;
+using WhatsappBusiness.CloudApi.WhasAppBusinessClientServicesInterface;
 
 namespace WhatsappBusiness.CloudApi.Extensions
 {
@@ -30,8 +32,8 @@ namespace WhatsappBusiness.CloudApi.Extensions
             var noOpPolicy = Policy.NoOpAsync().AsAsyncPolicy<HttpResponseMessage>();
 
             services.AddTransient<IWhatsAppBusinessClientFactory, WhatsAppBusinessClientFactory>();
-
-			services.AddSingleton(new WhatsAppBusinessCloudApiConfig
+           
+            services.AddSingleton(new WhatsAppBusinessCloudApiConfig
             {
                 WhatsAppBusinessPhoneNumberId = whatsAppConfig.WhatsAppBusinessPhoneNumberId,
                 WhatsAppBusinessAccountId = whatsAppConfig.WhatsAppBusinessAccountId,
@@ -40,7 +42,7 @@ namespace WhatsappBusiness.CloudApi.Extensions
                 AppName = whatsAppConfig.AppName,
                 Version = whatsAppConfig.Version
             });
-
+            // services.AddScoped<IWhatsAppTemplateManagementInterface, WhatsAppTemplateManagementInterface>();
             services.AddHttpClient<IWhatsAppBusinessClient, WhatsAppBusinessClient>(options =>
             {
                 options.BaseAddress = (string.IsNullOrWhiteSpace(graphAPIVersion)) ? WhatsAppBusinessRequestEndpoint.BaseAddress : new Uri(WhatsAppBusinessRequestEndpoint.GraphApiVersionBaseAddress.ToString().Replace("{{api-version}}", graphAPIVersion));
@@ -56,6 +58,7 @@ namespace WhatsappBusiness.CloudApi.Extensions
 
                 return handler;
             }).AddPolicyHandler(request => request.Method.Equals(HttpMethod.Get) ? retryPolicy : noOpPolicy);
+
         }
 
         public static void AddWhatsAppBusinessCloudApiService<THandler>(this IServiceCollection services, WhatsAppBusinessCloudApiConfig whatsAppConfig, string graphAPIVersion = null) where THandler : HttpMessageHandler
@@ -89,6 +92,9 @@ namespace WhatsappBusiness.CloudApi.Extensions
             }).SetHandlerLifetime(Timeout.InfiniteTimeSpan)
               .ConfigurePrimaryHttpMessageHandler<THandler>()
               .AddPolicyHandler(request => request.Method.Equals(HttpMethod.Get) ? retryPolicy : noOpPolicy);
+
+
+           
         }
     }
 }

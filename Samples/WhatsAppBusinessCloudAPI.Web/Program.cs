@@ -1,10 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 using WhatsappBusiness.CloudApi.Configurations;
 using WhatsappBusiness.CloudApi.Extensions;
+using WhatsappBusiness.CloudApi.WhasAppBusinessClientServices;
+using WhatsappBusiness.CloudApi.WhasAppBusinessClientServicesInterface;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//builder.
+
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
 	options.JsonSerializerOptions.WriteIndented = true;
@@ -15,6 +19,9 @@ builder.Services.Configure<WhatsAppBusinessCloudApiConfig>(options =>
 {
     builder.Configuration.GetSection("WhatsAppBusinessCloudApiConfiguration").Bind(options);
 });
+
+
+
 
 WhatsAppBusinessCloudApiConfig whatsAppConfig = new WhatsAppBusinessCloudApiConfig();
 whatsAppConfig.WhatsAppBusinessPhoneNumberId = builder.Configuration.GetSection("WhatsAppBusinessCloudApiConfiguration")["WhatsAppBusinessPhoneNumberId"];
