@@ -5,16 +5,19 @@ namespace WhatsappBusiness.CloudApi.Response
 {
     public class WhatsAppBusinessHSMWhatsAppHSMComponentGet
     {
-        [JsonPropertyName("add_security_recommendation")]
+        /*[JsonPropertyName("add_security_recommendation")]
         public bool AddSecurityRecommendation { get; set; }
 
         [JsonPropertyName("code_expiration_minutes")]
-        public int CodeExpirationMinutes { get; set; }
+        public int CodeExpirationMinutes { get; set; }*/
 
         [JsonPropertyName("example")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object Example { get; set; }
 
+
         [JsonPropertyName("format")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Format { get; set; }
 
         [JsonPropertyName("text")]
@@ -24,7 +27,9 @@ namespace WhatsappBusiness.CloudApi.Response
         public string Type { get; set; }
 
 		[JsonPropertyName("buttons")]
-		public List<TemplateButton> Buttons { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+
+        public List<TemplateButton> Buttons { get; set; }
 	}
 
     public class TemplateButton
@@ -36,9 +41,9 @@ namespace WhatsappBusiness.CloudApi.Response
 		public string Text { get; set; }
 
 		[JsonPropertyName("url")]
-		public string Url { get; set; }  // For URL type buttons
+		public string Url { get; set; }  
 
 		[JsonPropertyName("phone_number")]
-		public string PhoneNumber { get; set; }  // For PHONE_NUMBER type buttons
+		public string PhoneNumber { get; set; } 
 	}
 }

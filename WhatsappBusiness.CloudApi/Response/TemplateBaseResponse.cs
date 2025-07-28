@@ -26,12 +26,15 @@ namespace WhatsappBusiness.CloudApi.Response
         public string Language { get; set; }
 
         [JsonPropertyName("status")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Status { get; set; }
 
         [JsonPropertyName("category")]
         public string Category { get; set; }
 
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+
         public string Id { get; set; }
     }
 

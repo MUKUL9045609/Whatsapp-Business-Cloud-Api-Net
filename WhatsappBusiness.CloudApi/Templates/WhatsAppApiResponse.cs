@@ -34,6 +34,7 @@ namespace WhatsappBusiness.CloudApi.Templates
         public string Category { get; set; }
         public string ParameterFormat { get; set; }
         public List<WhatsAppTemplateComponent> Components { get; set; }
+
     }
 
     

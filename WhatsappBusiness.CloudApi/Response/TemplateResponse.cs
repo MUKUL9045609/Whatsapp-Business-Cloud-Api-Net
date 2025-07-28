@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace WhatsappBusiness.CloudApi.Response
 {
@@ -9,31 +11,40 @@ namespace WhatsappBusiness.CloudApi.Response
 
     public class WhatsAppTemplateResponse
     {
-        public string Name { get; set; }
-        public string Language { get; set; }
-        public string Category { get; set; }
-        public string DummyField { get; set; }
+        [JsonPropertyName("data")]
+        public TemplateData Data { get; set; }
 
-        public string HeaderText { get; set; }
-        public string BodyText { get; set; }
-        public string FooterText { get; set; }
+        [JsonPropertyName("components")]
+        public List<WhatsAppBusinessHSMWhatsAppHSMComponentGet> Components { get; set; }
 
-        public string Button1Text { get; set; }
-        public string Button2Text { get; set; }
+        [JsonPropertyName("paging")]
+        public TemplatePaging Paging { get; set; }
     }
-
     public class WhatsAppTemplateRequest
     {
+        [JsonPropertyName("data")]
+       
+        public TemplateData Data { get; set; }
+
+        [JsonPropertyName("components")]
+        public List<WhatsAppBusinessHSMWhatsAppHSMComponentGet> Components { get; set; }
+
+        [JsonPropertyName("paging")]
+        public TemplatePaging Paging { get; set; }
+
+
+        [JsonPropertyName("name")]
         public string Name { get; set; }
+
+
+
+        [JsonPropertyName("language")]
         public string Language { get; set; }
+
+     
+
+        [JsonPropertyName("category")]
         public string Category { get; set; }
-        public string DummyField { get; set; }
-
-        public string HeaderText { get; set; }
-        public string BodyText { get; set; }
-        public string FooterText { get; set; }
-
-        public string Button1Text { get; set; }
-        public string Button2Text { get; set; }
     }
+
 }

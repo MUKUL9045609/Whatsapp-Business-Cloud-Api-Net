@@ -16,78 +16,75 @@
 					<div class="font-weight-bold">
 						<h1 class="card-title">Template List </h1>
 					</div>
-				</div>	
 					<a href="@Url.Action("CreateTemplate", "TemplateManagement")" class="btn btn-primary stretched-link float-right">Create Template</a>
-					
-				</div>
-				
+				</div>	
+			</div>
 				
 				@foreach(var template in Model.Data)
 				{
-					<div class=" w-100 p-4">
-						<div class="card text-white bg-secondary ">
-						<h5 class="card-header">@template.Name</h5>
-						<div class="card-body">
-							@* <h5 class="card-title">@template.Category</h5 *@
-								<h5 class="card-title">@template.Status</h5>
-								<br />
-									<h5 class="card-title">@template.Id</h5>
-							<br />
-									<h5 class="card-title">@template.Language</h5>
-							<br />
-							<h5 class="card-title">@template.Category</h5>
-							@{
-								int count = 1; 
-							}
+                <div class="w-100 p-4">
+                    <div class="card text-white bg-secondary">
 
-							@foreach (var component in template.Components)
-							{
-								@if (component.Type.Equals("HEADER"))
-								{
-									<p class="card-text">@component.Type</p>
-									<p class="card-text">@component.Format</p>
-									<p class="card-text">@count. @component.Text</p>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>@template.Name</span>
+                            <div>
+                               
+                                <button onclick="DeleteTemplate('@template.Id', '@template.Name')" class="btn btn-sm btn-light" title="Delete">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
 
-								}
+                        <div class="card-body">
+                            <h5 class="card-title">@template.Status</h5>
+                            <h5 class="card-title">@template.Id</h5>
+                            <h5 class="card-title">@template.Language</h5>
+                            <h5 class="card-title">@template.Category</h5>
 
-								@if (component.Type.Equals("BODY"))
-								{
-									<p class="card-text">@component.Type</p>
-									<p class="card-text">@count. @component.Text</p>
-								
-								}
-								@if (component.Type.Equals("FOOTER"))
-								{
-									<p class="card-text">@component.Type</p>
-									<p class="card-text">@count. @component.Text</p>
+                            @{
+                                int count = 1;
+                            }
 
-								}
-								
-							    @if (component.Type.Equals("BUTTONS"))
-								{
-									<p class="card-text">@component.Type</p>
-									@foreach (var btn in component.Buttons)
-									{
-										<p class="card-text">@btn.Type</p>
-										<p class="card-text">@count. @btn.Text</p>
-										<p class="card-text">@btn.Url</p>
-			
-									}
-								}
-								
-								
-								@* <a href="#" class="btn btn-primary">Go somewhere</a> *@
+                            @foreach (var component in template.Components)
+                            {
+                                if (component.Type == "HEADER")
+                                {
+                                    <p class="card-text">@component.Type</p>
+                                    <p class="card-text">@component.Format</p>
+                                    <p class="card-text">@count. @component.Text</p>
+                                }
+                                else if (component.Type == "BODY")
+                                {
+                                    <p class="card-text">@component.Type</p>
+                                    <p class="card-text">@count. @component.Text</p>
+                                }
+                                else if (component.Type == "FOOTER")
+                                {
+                                    <p class="card-text">@component.Type</p>
+                                    <p class="card-text">@count. @component.Text</p>
+                                }
+                                else if (component.Type == "BUTTONS")
+                                {
+                                    <p class="card-text">@component.Type</p>
+                                    @foreach (var btn in component.Buttons)
+                                    {
+                                        <p class="card-text">@btn.Type</p>
+                                        <p class="card-text">@count. @btn.Text</p>
+                                        <p class="card-text">@btn.Url</p>
+                                    }
+                                }
 
-								count++; // Increment the counter
-							}
+                                count++;
+                            }
+                        </div>
+                    </div>
+                </div>
 
-							
-						</div>
-					</div>
-					</div>
+
+
 				}
 				
-			</div> <!-- /.card -->
+			<!-- /.card -->
 		</div>
 	</div>
 </section>
@@ -96,4 +93,31 @@
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+	<script>
+				
+
+					function DeleteTemplate(TemplateId ,TemplateName )
+					    {
+						    if(!confirm("Are you sure wanto delete this Template?")) return;
+						
+						    $.ajax({
+		                       url:"@Url.ActionLink("DeleteTemplate", "TemplateManagement")",
+						       type:'POST',
+						       data:{
+									    hsm_id:TemplateId,
+									    templateName:TemplateName
+								    },
+							    success: function (response) {
+								    alert(response.message || "Template deleted successfully.");
+								    location.reload();
+							    },
+							    error: function (xhr) {
+								    alert("Error: " + xhr.responseText);
+							    }
+
+						    });
+					    }
+
+				
+	</script>
 } 
