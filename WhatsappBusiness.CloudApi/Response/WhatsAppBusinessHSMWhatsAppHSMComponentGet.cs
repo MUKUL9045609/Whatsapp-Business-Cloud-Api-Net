@@ -11,10 +11,13 @@ namespace WhatsappBusiness.CloudApi.Response
         [JsonPropertyName("code_expiration_minutes")]
         public int CodeExpirationMinutes { get; set; }*/
 
+        /*    [JsonPropertyName("example")]
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+            public object Example { get; set; }
+    */
         [JsonPropertyName("example")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object Example { get; set; }
-
+        public Example Example { get; set; }
 
         [JsonPropertyName("format")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -46,4 +49,9 @@ namespace WhatsappBusiness.CloudApi.Response
 		[JsonPropertyName("phone_number")]
 		public string PhoneNumber { get; set; } 
 	}
+    public class Example
+    {
+        [JsonPropertyName("body_text")]
+        public List<List<string>> BodyText { get; set; }
+    }
 }

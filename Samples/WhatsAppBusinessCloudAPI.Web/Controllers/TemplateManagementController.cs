@@ -32,6 +32,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
             var response = new TemplateResponse
             {
                 Data = result.Data,
+                
             };
             return View(response);
         }
@@ -81,7 +82,10 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
                     Type = c.Type,
                     Text = c.Text,
                     Format = c.Type == "HEADER" ? c.Format : null,
-                    Example = c.Example
+                    Example = new Example
+                    {
+                        BodyText = c.Example?.BodyText ?? new List<List<string>>()
+                    }
                 }).ToList();
 
                 var template = new TemplateData

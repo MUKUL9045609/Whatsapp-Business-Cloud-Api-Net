@@ -58,17 +58,27 @@
                                 <label class="form-label">Format</label>
                                 <input name="format" class="form-control" value="TEXT" />
                             </div>
-                            <div class="mb-2">
+                            @* <div class="mb-2">
                                 <label class="form-label">Text</label>
                                 <input name="text" class="form-control" value="Our sales is on!" />
+                            </div> *@
+                            <div class="mb-2">
+                                @* <div class="example-group"> *@
+                                    <label class="form-label">Example Text</label>
+                                   @*  <input name="example_text" class="form-control" value="Diwali sales" /> *@
+                                    <textarea class="form-control" name="text" id="exampleFormControlTextarea1" rows="3" value="Diwali sales"></textarea>
+
+                                @* </div> *@
                             </div>
-                            <div class="mb-2 example-group">
-                                <label class="form-label">Example Text</label>
-                                <input name="example_text" class="form-control" value="Diwali sales" />
-                            </div>
+                            <button type="button" data-bs-toggle="tooltip" title="Add variable" class="btn btn-light" id="Addvariable"><i class="fa-solid fa-plus"></i></button>
+                            <br />
+                            <div id="variableInputsContainer" class="mb-3"></div>
                         </div>
                     </div>
-
+                   
+                     
+                        
+                   
                     <button type="button" class="btn btn-secondary mb-2" onclick="addComponent()">Add Component</button>
                     <br />
                     <button type="submit" class="btn btn-primary">Save Template</button>
@@ -79,6 +89,7 @@
 		</div>
 	</div>
 </section>
+
 
 @section Scripts {
 	@{
@@ -95,6 +106,7 @@
 
             const components = [];
             const componentDivs = document.querySelectorAll('.component');
+
 
             componentDivs.forEach(div => {
                 const type = div.querySelector('[name="type"]').value.toUpperCase();
@@ -113,14 +125,27 @@
                             header_text: [headerExample]
                         };
                     }
-                } else if (type === "BODY") {
-                    const bodyExample = div.querySelector('[name="example_text"]').value;
-                    if (bodyExample) {
-                        component.example = {
-                            body_text: [bodyExample]
-                        };
+                }  
+                    else if (type === "BODY") {
+                        // Collect all dynamic variable inputs inside this component
+                        const variableInputs = div.querySelectorAll('input[name^="variable_"]');
+                        const variableValues = Array.from(variableInputs).map(input => input.value);
+
+                        if (variableValues.length > 0) {
+                            // WhatsApp expects nested array: body_text: [ [values] ]
+                            component.example = {
+                                body_text: [variableValues]
+                            };
+                        } else {
+                            // fallback to example_text textarea content if no variables entered
+                            const bodyExample = div.querySelector('[name="example_text"]').value;
+                            if (bodyExample) {
+                                component.example = {
+                                    body_text: [bodyExample]
+                                };
+                            }
+                        }
                     }
-                }
 
                 components.push(component);
             });
@@ -171,14 +196,14 @@
                     <label class="form-label">Text</label>
                     <input name="text" class="form-control" placeholder="Enter text" />
                 </div>
-                <div class="mb-2 component-body" style="display:none;">
-                    <label class="form-label">Body Text <small class="text-muted">(Use {{1}}, {{2}}...)</small></label>
-                    <input type="text" name="example_text" class="form-control" placeholder="John, #12345" />
-                </div>
+                
                 <div class="mb-2 example-group">
-                    <label class="form-label">Example Text</label>
-                    <input name="example_text" class="form-control" value="" />
-                </div>
+                                <label class="form-label">Example Text</label>
+                               @*  <input name="example_text" class="form-control" value="Diwali sales" /> *@
+                                <textarea class="form-control" name="example_text"  id="exampleFormControlTextarea1" rows="3" value="Diwali sales"></textarea>
+
+                            </div>
+                
             `;
             container.appendChild(div);
         }
@@ -209,6 +234,50 @@
         }
 
 
-    </script>
+        //    $(document).ready(function () {
+        //     let variableCount = 1;
 
+        //     $('#Addvariable').click(function () {
+        //         const textarea = $('#exampleFormControlTextarea1');
+        //         const currentText = textarea.val();
+
+        //         Append variable like {{1}}, {{2}}, ...
+        //         const updatedText = currentText + ' {{' + variableCount + '}}';
+        //         textarea.val(updatedText);
+
+        //         variableCount++; Increment for next click
+        //     });
+        // });
+             $(document).ready(function () {
+            // Enable tooltip
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            let variableCount = 1;
+
+            $('#Addvariable').click(function () {
+                
+                const textarea = $('#exampleFormControlTextarea1');
+                const currentText = textarea.val();
+                textarea.val(currentText + ' {{' + variableCount + '}}');
+
+                const newInput = `
+                    <div class="mb-2 input-group">
+                      
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroupPrepend">{{${variableCount}}}</span>
+                            </div>
+                        <input type="text" class="form-control" name="variable_${variableCount}" placeholder="Add value for {{${variableCount}}}" />
+                    </div>
+                `;
+                $('#variableInputsContainer').append(newInput);
+
+                variableCount++;
+            });
+        });
+
+    </script>
+   
 }

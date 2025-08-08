@@ -57,7 +57,19 @@
                                 {
                                     <p class="card-text">@component.Type</p>
                                     <p class="card-text">@count. @component.Text</p>
+                                    <h5 > text Variable</h5>
+                                    @if (component.Example != null && component.Example.BodyText != null)
+                                    {
+                                        @foreach (var innerList in component.Example.BodyText)
+                                        {
+                                            @foreach (var text in innerList)
+                                            {
+                                                <p class="card-text">@text</p>
+                                            }
+                                        }
+                                    }
                                 }
+
                                 else if (component.Type == "FOOTER")
                                 {
                                     <p class="card-text">@component.Type</p>
