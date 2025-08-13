@@ -1,4 +1,6 @@
 ﻿@using WhatsappBusiness.CloudApi.Response
+
+@Html.AntiForgeryToken()
 @model WhatsAppTemplateResponse;
 @{
 	ViewData["Title"] = "Get All Template  Page";
@@ -7,6 +9,15 @@
 	// ViewData["ControllerName"] = nameof(HomeController).Replace("Controller", "");
 	// ViewData["ActionName"] = nameof(HomeController.SendWhatsAppTextMessage);
 }
+<style>
+    #OnTextSelect,
+    #OnImageSelect,
+    #OnVideoSelect,
+    #OnDocumentSelect,
+    #OnLocationSelect {
+        display: none;
+    }
+</style>
 
 <section class="content">
     <div class="row g-3">
@@ -42,22 +53,55 @@
                     </div>
 
                     <hr />
+                        <div class="component p-3 border rounded mb-3 bg-white">
+                             <h5>Header (Optional) </h5>
+                            <div  class="mb-2">
+                                <label class="form-label">Select Template Type</label>
+                                    <select id="TemplateType" name="TemplateType" class="form-control">
+                                        <option value="Text">Text</option>
+                                        <option value="Image">Image</option>
+                                        <option value="Video">Video</option>
+                                        <option value="Document">Document</option>
+                                        <option value="Location">Location</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div id="OnTextSelect">
+                            <p> the text is selected</p>
+                        </div>
+                        <div id="OnImageSelect">
+                            <div class="mb-2">
+                            <label for="formFile" class="form-label">Add Sample Media*e</label>
+                            <input class="form-control" type="file" name="media" id="myFileInput">
+                            </div>
+                        </div>
+                        <br />
+                        <div id="OnVideoSelect">
+                            <p> the video is selected</p>
+                        </div>
+                        <div id="OnDocumentSelect">
+                            <p> the document is selected</p>
+                        </div>
+                        <div id="OnLocationSelect">
+                            <p> the location is selected</p>
+                        </div>
+                   
                     <div id="componentsContainer">
                         <!-- One default HEADER component -->
                         <div class="component p-3 border rounded mb-3 bg-white">
-                            <h5>Component</h5>
-                            <div class="mb-2">
+                            <h5>Body (Require)</h5>
+                            @* <div class="mb-2">
                                 <label class="form-label">Type</label>
                                 <select name="type" class="form-control" onchange="handleTypeChange(this)">
                                     <option value="HEADER">HEADER</option>
                                     <option value="BODY">BODY</option>
                                     <option value="FOOTER">FOOTER</option>
                                 </select>
-                            </div>
-                            <div class="mb-2 format-group">
+                            </div> *@
+                            @* <div class="mb-2 format-group">
                                 <label class="form-label">Format</label>
                                 <input name="format" class="form-control" value="TEXT" />
-                            </div>
+                            </div> *@
                             @* <div class="mb-2">
                                 <label class="form-label">Text</label>
                                 <input name="text" class="form-control" value="Our sales is on!" />
@@ -75,12 +119,9 @@
                             <div id="variableInputsContainer" class="mb-3"></div>
                         </div>
                     </div>
-                   
-                     
-                        
-                   
                     <button type="button" class="btn btn-secondary mb-2" onclick="addComponent()">Add Component</button>
                     <br />
+                    <input type="hidden" id="uploadResponse" name="uploadResponse" />
                     <button type="submit" class="btn btn-primary">Save Template</button>
                 </form>
 
@@ -90,165 +131,85 @@
 	</div>
 </section>
 
+@* <input class="form-control" type="file" name="media" id="myFileInput"> *@
+<input type="hidden" id="uploadResponse" name="uploadResponse" />
+<input type="hidden" id="SelectedUploadType" value="Resumable Upload" />
 
 @section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+     @*on select template type componet display *@
     <script>
-        document.getElementById("templateForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const form = e.target;
-            const name = form.querySelector('[name="name"]').value;
-            const language = form.querySelector('[name="language"]').value;
-            const category = form.querySelector('[name="category"]').value;
-
-            const components = [];
-            const componentDivs = document.querySelectorAll('.component');
-
-
-            componentDivs.forEach(div => {
-                const type = div.querySelector('[name="type"]').value.toUpperCase();
-                const text = div.querySelector('[name="text"]').value;
-
-                const component = {
-                    type,
-                    text
-                };
-
-                if (type === "HEADER") {
-                    component.format = div.querySelector('[name="format"]').value;
-                    const headerExample = div.querySelector('[name="example_text"]').value;
-                    if (headerExample) {
-                        component.example = {
-                            header_text: [headerExample]
-                        };
-                    }
-                }  
-                    else if (type === "BODY") {
-                        // Collect all dynamic variable inputs inside this component
-                        const variableInputs = div.querySelectorAll('input[name^="variable_"]');
-                        const variableValues = Array.from(variableInputs).map(input => input.value);
-
-                        if (variableValues.length > 0) {
-                            // WhatsApp expects nested array: body_text: [ [values] ]
-                            component.example = {
-                                body_text: [variableValues]
-                            };
-                        } else {
-                            // fallback to example_text textarea content if no variables entered
-                            const bodyExample = div.querySelector('[name="example_text"]').value;
-                            if (bodyExample) {
-                                component.example = {
-                                    body_text: [bodyExample]
-                                };
-                            }
-                        }
-                    }
-
-                components.push(component);
-            });
-
-            const payload = {
-                name,
-                language,
-                category,
-                components
-            };
-
-            const response = await fetch('/TemplateManagement/CreateTemplates', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                alert("Template created successfully: " + JSON.stringify(result));
-            } else {
-                alert("Error: " + result);
-            }
+     
+        $(document).ready(function(){
+               $(window).on("load",function(){
+                   $('#OnTextSelect, #OnImageSelect, #OnVideoSelect, #OnDocumentSelect, #OnLocationSelect').hide();
+               
+               });
+           $('#TemplateType').change(function () {
+                var selectedType = $(this).val();
+               
+                
+                if (selectedType === 'Text') {
+                    $('#OnTextSelect').show();
+                } else if (selectedType === 'Image') {
+                    $('#OnImageSelect').show();
+                } else if (selectedType === 'Video') {
+                    $('#OnVideoSelect').show();
+                } else if (selectedType === 'Document') {
+                    $('#OnDocumentSelect').show();
+                } else if (selectedType === 'Location') {
+                    $('#OnLocationSelect').show();
+                }
+           });
         });
 
-               function addComponent() {
-            const container = document.getElementById("componentsContainer");
+    </script>
 
-            const div = document.createElement("div");
-            div.className = "component p-3 border rounded mb-3 bg-white";
-            div.innerHTML = `
-                <h5>Component</h5>
-                <div class="mb-2">
-                    <label class="form-label">Type</label>
-                    <select name="type" class="form-control" onchange="handleTypeChange(this)">
-                        <option value="HEADER">HEADER</option>
-                        <option value="BODY">BODY</option>
-                        <option value="FOOTER">FOOTER</option>
-                    </select>
-                </div>
-                <div class="mb-2 format-group">
-                    <label class="form-label">Format</label>
-                    <input name="format" class="form-control" value="TEXT" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Text</label>
-                    <input name="text" class="form-control" placeholder="Enter text" />
-                </div>
-                
-                <div class="mb-2 example-group">
-                                <label class="form-label">Example Text</label>
-                               @*  <input name="example_text" class="form-control" value="Diwali sales" /> *@
-                                <textarea class="form-control" name="example_text"  id="exampleFormControlTextarea1" rows="3" value="Diwali sales"></textarea>
+     @* on select file *@
+    <script>
+      
+                $(document).ready(function () {
+            $('#myFileInput').on('change', function () {
+                var fileInput = this;
+                if (fileInput.files && fileInput.files.length > 0) {
+                     var selectedFile = fileInput.files[0];
+                     var formData = new FormData();
+                     formData.append('mediaFile', selectedFile); 
+                     formData.append('selectedUploadType', $('#SelectedUploadType').val());
+                     formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
 
-                            </div>
-                
-            `;
-            container.appendChild(div);
-        }
-
-
-             function handleTypeChange(select) {
-            const componentDiv = select.closest('.component');
-            const formatGroup = componentDiv.querySelector('.format-group');
-            const exampleGroup = componentDiv.querySelector('.example-group');
-            const bodyExampleGroup = componentDiv.querySelector('.component-body');
-
-            const type = select.value;
-
-            if (type === "HEADER") {
-                formatGroup.style.display = "block";
-                exampleGroup.style.display = "block";
-                if (bodyExampleGroup) bodyExampleGroup.style.display = "none";
-                exampleGroup.querySelector('label').innerText = "Example Header Text";
-            } else if (type === "BODY") {
-                formatGroup.style.display = "none";
-                exampleGroup.style.display = "none";
-                if (bodyExampleGroup) bodyExampleGroup.style.display = "block";
-            } else {
-                formatGroup.style.display = "none";
-                exampleGroup.style.display = "none";
-                if (bodyExampleGroup) bodyExampleGroup.style.display = "none";
-            }
-        }
-
-
-        //    $(document).ready(function () {
-        //     let variableCount = 1;
-
-        //     $('#Addvariable').click(function () {
-        //         const textarea = $('#exampleFormControlTextarea1');
-        //         const currentText = textarea.val();
-
-        //         Append variable like {{1}}, {{2}}, ...
-        //         const updatedText = currentText + ' {{' + variableCount + '}}';
-        //         textarea.val(updatedText);
-
-        //         variableCount++; Increment for next click
-        //     });
-        // });
-             $(document).ready(function () {
+                    $.ajax({
+                        url: '@Url.ActionLink("UploadImage", "TemplateManagement")',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+                                console.log("H:", response.h);
+                                $('#uploadResponse').val(response.h);
+                                console.log("StatusId:", response.statusId);
+                                console.log("FileOffset:", response.fileOffset);
+                            } else {
+                                console.error("Error:", response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error uploading file:', error);
+                        }
+                    });
+                } else {
+                    console.log("No file selected.");
+                }
+            });
+        });
+    </script>
+    
+     @* #add variable in body input  *@
+    <script>
+        $(document).ready(function () {
             // Enable tooltip
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -258,14 +219,14 @@
             let variableCount = 1;
 
             $('#Addvariable').click(function () {
-                
+
                 const textarea = $('#exampleFormControlTextarea1');
                 const currentText = textarea.val();
                 textarea.val(currentText + ' {{' + variableCount + '}}');
 
                 const newInput = `
                     <div class="mb-2 input-group">
-                      
+
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="inputGroupPrepend">{{${variableCount}}}</span>
                             </div>
@@ -277,7 +238,190 @@
                 variableCount++;
             });
         });
+    </script>
+
+    <script>
+        $(document).ready(function(){
+
+            $("#templateForm").submit(function (e) {
+                e.preventDefault();
+
+                let formData = new FormData(this); 
+
+               
+                formData.append("variableInputs", $("#variableInputsContainer").html());
+
+                $.ajax({
+                    url: '@Url.ActionLink("CreateTemplates", "TemplateManagement")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false, 
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("H:", response.h);
+                            $("#uploadResponse").val(response.h);
+                            console.log("StatusId:", response.statusId);
+                            console.log("FileOffset:", response.fileOffset);
+                            alert("Template saved successfully!");
+                        } else {
+                            console.error("Error:", response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error uploading file:", error);
+                    }
+                });
+            });
+        });
+        // document.getElementById("templateForm").addEventListener("submit", async function (e) {
+        //     e.preventDefault();
+
+        //     const form = e.target;
+        //     const name = form.querySelector('[name="name"]').value;
+        //     const language = form.querySelector('[name="language"]').value;
+        //     const category = form.querySelector('[name="category"]').value;
+
+        //     const components = [];
+        //     const componentDivs = document.querySelectorAll('.component');
+
+
+        //     componentDivs.forEach(div => {
+        //         const type = div.querySelector('[name="type"]').value.toUpperCase();
+        //         const text = div.querySelector('[name="text"]').value;
+
+        //         const component = {
+        //             type,
+        //             text
+        //         };
+
+        //         if (type === "HEADER") {
+        //             component.format = div.querySelector('[name="format"]').value;
+        //             const headerExample = div.querySelector('[name="example_text"]').value;
+        //             if (headerExample) {
+        //                 component.example = {
+        //                     header_text: [headerExample]
+        //                 };
+        //             }
+        //         }
+        //             else if (type === "BODY") {
+                     
+        //                 const variableInputs = div.querySelectorAll('input[name^="variable_"]');
+        //                 const variableValues = Array.from(variableInputs).map(input => input.value);
+
+        //                 if (variableValues.length > 0) {
+                           
+        //                     component.example = {
+        //                         body_text: [variableValues]
+        //                     };
+        //                 } else {
+                           
+        //                     const bodyExample = div.querySelector('[name="example_text"]').value;
+        //                     if (bodyExample) {
+        //                         component.example = {
+        //                             body_text: [bodyExample]
+        //                         };
+        //                     }
+        //                 }
+        //             }
+
+        //         components.push(component);
+        //     });
+
+        //     const payload = {
+        //         name,
+        //         language,
+        //         category,
+        //         components
+        //     };
+
+        //     const response = await fetch('/TemplateManagement/CreateTemplates', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(payload)
+        //     });
+
+        //     const result = await response.json();
+        //     if (response.ok) {
+        //         alert("Template created successfully: " + JSON.stringify(result));
+        //     } else {
+        //         alert("Error: " + result);
+        //     }
+        // });
+
+        // function addComponent() {
+        //     const container = document.getElementById("componentsContainer");
+
+        //     const div = document.createElement("div");
+        //     div.className = "component p-3 border rounded mb-3 bg-white";
+        //     div.innerHTML = `
+        //         <h5>Component</h5>
+        //         <div class="mb-2">
+        //             <label class="form-label">Type</label>
+        //             <select name="type" class="form-control" onchange="handleTypeChange(this)">
+        //                 <option value="HEADER">HEADER</option>
+        //                 <option value="BODY">BODY</option>
+        //                 <option value="FOOTER">FOOTER</option>
+        //             </select>
+        //         </div>
+        //         <div class="mb-2 format-group">
+        //             <label class="form-label">Format</label>
+        //             <input name="format" class="form-control" value="TEXT" />
+        //         </div>
+        //         <div class="mb-2">
+        //             <label class="form-label">Text</label>
+        //             <input name="text" class="form-control" placeholder="Enter text" />
+        //         </div>
+
+        //         <div class="mb-2 example-group">
+        //                         <label class="form-label">Example Text</label>
+        //                        @*  <input name="example_text" class="form-control" value="Diwali sales" /> *@
+        //                         <textarea class="form-control" name="example_text"  id="exampleFormControlTextarea1" rows="3" value="Diwali sales"></textarea>
+
+        //                     </div>
+
+        //     `;
+        //     container.appendChild(div);
+        // }
+
+        //      function handleTypeChange(select) {
+
+        //     const componentDiv = select.closest('.component');
+        //     const formatGroup = componentDiv.querySelector('.format-group');
+        //     const exampleGroup = componentDiv.querySelector('.example-group');
+        //     const bodyExampleGroup = componentDiv.querySelector('.component-body');
+
+        //     const type = select.value;
+
+        //     if (type === "HEADER") {
+        //         formatGroup.style.display = "block";
+        //         exampleGroup.style.display = "block";
+        //         if (bodyExampleGroup) bodyExampleGroup.style.display = "none";
+        //         exampleGroup.querySelector('label').innerText = "Example Header Text";
+        //     } else if (type === "BODY") {
+        //         formatGroup.style.display = "none";
+        //         exampleGroup.style.display = "none";
+        //         if (bodyExampleGroup) bodyExampleGroup.style.display = "block";
+        //     } else {
+        //         formatGroup.style.display = "none";
+        //         exampleGroup.style.display = "none";
+        //         if (bodyExampleGroup) bodyExampleGroup.style.display = "none";
+        //     }
+        // }
+
+
+        
+             
 
     </script>
-   
+
 }
+
+
+
+
+
+
+

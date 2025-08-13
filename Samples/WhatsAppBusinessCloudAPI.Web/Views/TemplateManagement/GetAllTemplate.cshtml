@@ -49,6 +49,18 @@
                             {
                                 if (component.Type == "HEADER")
                                 {
+                                    if (component.Format == "IMAGE")
+                                    {
+                                        <div class="col-6 col-md-4">
+
+                                            @if (component.Example.HeaderHandle != null && component.Example.HeaderHandle.Length > 0)
+                                                {
+                                                    <img src="@component.Example.HeaderHandle[0]" class="img-fluid rounded-start" alt="Header Image">
+                                                }
+                                        </div>
+                                       
+                                    
+                                    }
                                     <p class="card-text">@component.Type</p>
                                     <p class="card-text">@component.Format</p>
                                     <p class="card-text">@count. @component.Text</p>

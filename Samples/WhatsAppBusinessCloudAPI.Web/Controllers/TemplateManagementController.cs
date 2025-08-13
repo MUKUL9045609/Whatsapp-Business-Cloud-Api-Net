@@ -2,9 +2,12 @@
 using System.ComponentModel;
 using System.Threading;
 using WhatsappBusiness.CloudApi.Configurations;
+using WhatsappBusiness.CloudApi.Exceptions;
 using WhatsappBusiness.CloudApi.Interfaces;
 using WhatsappBusiness.CloudApi.Response;
 using WhatsappBusiness.CloudApi.Templates;
+using WhatsAppBusinessCloudAPI.Web.Extensions.Alerts;
+using WhatsAppBusinessCloudAPI.Web.ViewModel;
 
 namespace WhatsAppBusinessCloudAPI.Web.Controllers
 {
@@ -13,10 +16,13 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
         private readonly IWhatsAppBusinessClient _whatsAppBusinessClient;
         IConfiguration _configuration;
         private WhatsAppBusinessCloudApiConfig _whatsAppConfig;
-        public TemplateManagementController(IWhatsAppBusinessClient whatsAppBusinessClient, WhatsAppBusinessCloudApiConfig whatsAppConfig)
+        private readonly IWebHostEnvironment _environment;
+
+        public TemplateManagementController(IWhatsAppBusinessClient whatsAppBusinessClient, WhatsAppBusinessCloudApiConfig whatsAppConfig, IWebHostEnvironment environment)
         {
             _whatsAppBusinessClient = whatsAppBusinessClient;
             _whatsAppConfig = whatsAppConfig;
+            _environment = environment;
         }
         public IActionResult Index()
         {
@@ -25,6 +31,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
 
         public async Task<IActionResult> GetAllTemplate()   
         {
+            Console.Write("request is corret");
             string whatsAppBusinessAccountId = "101600782940170";
 
             var result = await _whatsAppBusinessClient.GetAllTemplatesAsync(whatsAppBusinessAccountId, null, null);
@@ -32,6 +39,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
             var response = new TemplateResponse
             {
                 Data = result.Data,
+               
                 
             };
             return View(response);
@@ -40,6 +48,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateTemplate()
         {
+          
             var viewmodel = new WhatsAppTemplateResponse
             {
                 Data = new TemplateData(),
@@ -72,7 +81,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
             {
                 return BadRequest("Invalid template data.");
             }
-
+           
             try
             {
                 var wabaId = _whatsAppConfig.WhatsAppBusinessAccountId;
@@ -114,6 +123,78 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadImage(UploadMediaViewModel uploadMediaViewModel, IFormFile mediaFile)
+        {
+            try
+            {
+                var fileName = Path.GetFileName(mediaFile.FileName).Trim('"');
+
+                var rootPath = Path.Combine(_environment.WebRootPath, "Application_Files\\MediaUploads\\");
+                if (!Directory.Exists(rootPath))
+                {
+                    Directory.CreateDirectory(rootPath);
+                }
+
+              
+                var filePath = Path.Combine(rootPath, fileName);
+
+               
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await mediaFile.CopyToAsync(stream);
+                }
+
+               
+                var resumableUploadMediaResult = await _whatsAppBusinessClient.CreateResumableUploadSessionAsync(
+                    mediaFile.Length,
+                    mediaFile.ContentType,
+                    mediaFile.FileName
+                );
+
+                string hValue = null;
+                string statusId = null;
+                long? fileOffset = null;
+
+                if (resumableUploadMediaResult is not null)
+                {
+                    var uploadSessionId = resumableUploadMediaResult.Id;
+
+                    var resumableUploadResponse = await _whatsAppBusinessClient.UploadFileDataAsync(uploadSessionId, filePath, mediaFile.ContentType);
+                    var queryResumableUploadStatus = await _whatsAppBusinessClient.QueryFileUploadStatusAsync(uploadSessionId);
+
+                    if (resumableUploadResponse is not null)
+                    {
+                        hValue = resumableUploadResponse.H;
+                    }
+
+                    if (queryResumableUploadStatus is not null)
+                    {
+                        statusId = queryResumableUploadStatus.Id;
+                        fileOffset = queryResumableUploadStatus.FileOffset;
+                    }
+                }
+
+              
+                return Json(new
+                {
+                    success = true,
+                    message = "Successfully uploaded media.",
+                    h = hValue,
+                    statusId = statusId,
+                    fileOffset = fileOffset
+                });
+            }
+            catch (WhatsappBusinessCloudAPIException ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
 
 
         //[Route("api/create-template")]

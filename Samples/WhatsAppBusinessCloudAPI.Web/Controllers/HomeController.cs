@@ -1334,7 +1334,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
                 return View().WithDanger("Error", ex.Message);
             }
         }
-
+        [HttpGet]
         public IActionResult UploadMedia()
         {
             UploadMediaViewModel uploadMediaViewModel = new UploadMediaViewModel();

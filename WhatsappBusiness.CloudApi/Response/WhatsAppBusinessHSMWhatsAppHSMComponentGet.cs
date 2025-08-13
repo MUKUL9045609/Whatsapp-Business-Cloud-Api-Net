@@ -53,5 +53,8 @@ namespace WhatsappBusiness.CloudApi.Response
     {
         [JsonPropertyName("body_text")]
         public List<List<string>> BodyText { get; set; }
+
+        [JsonPropertyName("header_handle")]
+        public string[] HeaderHandle { get; set; }
     }
 }
