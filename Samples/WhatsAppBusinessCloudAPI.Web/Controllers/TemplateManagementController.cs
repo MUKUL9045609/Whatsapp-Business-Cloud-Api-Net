@@ -32,7 +32,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
         public async Task<IActionResult> GetAllTemplate()   
         {
             Console.Write("request is corret");
-            string whatsAppBusinessAccountId = "101600782940170";
+            string whatsAppBusinessAccountId = _whatsAppConfig.WhatsAppBusinessAccountId;
 
             var result = await _whatsAppBusinessClient.GetAllTemplatesAsync(whatsAppBusinessAccountId, null, null);
 

@@ -8,6 +8,21 @@
         public string? MediaId { get; set; }
         public string? LinkUrl { get; set; }
         public string? TemplateParams { get; set; }
+        public int MyProperty { get; set; }
+
+
+    }
+
+    public class SendTemplateRequest
+    { //
+        public string RecipientPhoneNumber { get; set; }
+        public string Message { get; set; }        
+        public string TemplateName { get; set; }
+        public string? MediaId { get; set; }
+        public string? LinkUrl { get; set; }
+        public string? TemplateParams { get; set; }
+        public string Langcode { get; set; }
+
 
     }
 }

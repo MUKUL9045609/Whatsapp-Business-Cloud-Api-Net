@@ -56,7 +56,7 @@ namespace WhatsAppBusinessCloudAPI.Web.Controllers
 
                 var results = await _whatsAppBusinessClient.SendTextMessageAsync(textMessageRequest);
 
-                return RedirectToAction(nameof(Index)).WithSuccess("Success", "Successfully sent text message");
+                return RedirectToAction(nameof(SendWhatsAppTextMessage)).WithSuccess("Success", "Successfully sent text message");
             }
             catch (WhatsappBusinessCloudAPIException ex)
             {

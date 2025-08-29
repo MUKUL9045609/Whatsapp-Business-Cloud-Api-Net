@@ -11,10 +11,10 @@ namespace WhatsappBusiness.CloudApi.Response
         [JsonPropertyName("code_expiration_minutes")]
         public int CodeExpirationMinutes { get; set; }*/
 
-        /*    [JsonPropertyName("example")]
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-            public object Example { get; set; }
-    */
+/*      [JsonPropertyName("example")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public object Example { get; set; }
+*/
         [JsonPropertyName("example")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Example Example { get; set; }
